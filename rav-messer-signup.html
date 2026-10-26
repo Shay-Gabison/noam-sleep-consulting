@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline' https://form2.ravpage.co.il https://js.ravpages.co.il https://www.google.com https://www.gstatic.com; style-src 'unsafe-inline' https://css.ravpages.co.il; font-src https://fonts.ravpages.co.il https://fonts.gstatic.com https://simages.ravpages.co.il data:; img-src data: https:; connect-src https://form2.ravpage.co.il https://safe-subscriber.responder.live https://www.google.com https://www.gstatic.com; frame-src https://www.google.com https://recaptcha.google.com; form-action https://safe-subscriber.responder.live; base-uri 'none'; object-src 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>הרשמה לעדכוני שינה והורות</title>
+    <style>
+      html,
+      body {
+        min-width: 0;
+        margin: 0;
+        overflow-x: clip;
+        background: transparent;
+      }
+
+      .multyform .formBody,
+      .multyform form,
+      .multyform .multyfields,
+      .multyform .inner_multyfields,
+      .multyform .multyfield,
+      .multyform .field,
+      .multyform .field input[type="text"],
+      .multyform .submitbuttonbox,
+      .multyform .submitButtonContainer_wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+      }
+
+      .multyform form {
+        display: grid !important;
+        gap: 0.9rem !important;
+      }
+
+      .multyform .inner_multyfields {
+        display: block !important;
+      }
+
+      .multyform .confirmation.horizontal {
+        position: static !important;
+        display: grid !important;
+        width: 100% !important;
+        grid-template-columns: 1.5rem minmax(0, 1fr) !important;
+        gap: 0.65rem !important;
+        align-items: start !important;
+        inset: auto !important;
+        transform: none !important;
+      }
+
+      .multyform .confirmation:not(.horizontal),
+      .multyform .submitButtonContainer_wrapper.ravxx_hover {
+        display: none !important;
+      }
+
+      .multyform .confirmation_text {
+        width: auto !important;
+        max-width: 100% !important;
+        white-space: normal !important;
+        cursor: pointer !important;
+      }
+
+      .multyform .submitbuttonbox {
+        height: auto !important;
+      }
+    </style>
+  </head>
+  <body>
+    <script
+      src="https://form2.ravpage.co.il/8963b05dedd46a3c9bda6c75a7d5a56f6ADF21EA"
+      charset="UTF-8"
+    ></script>
+    <script>
+      (() => {
+        const setImportant = (element, property, value) => {
+          if (element) element.style.setProperty(property, value, "important");
+        };
+
+        const applyResponsiveLayout = () => {
+          const form = document.querySelector(".multyform form");
+          if (!form) return;
+
+          setImportant(form, "display", "grid");
+          setImportant(form, "gap", "0.9rem");
+
+          const focusFirstValidationError = () => {
+            window.setTimeout(() => {
+              const invalidField = Array.from(
+                form.querySelectorAll(
+                  "input.validation_error:not([type='hidden']), select.validation_error, textarea.validation_error"
+                )
+              ).find(
+                (element) =>
+                  element instanceof HTMLElement &&
+                  getComputedStyle(element).display !== "none"
+              );
+              if (invalidField instanceof HTMLElement) {
+                invalidField.setAttribute("aria-invalid", "true");
+                invalidField.focus();
+              }
+            }, 0);
+          };
+
+          if (!form.dataset.noamValidationFocus) {
+            form.dataset.noamValidationFocus = "true";
+            form.addEventListener("submit", focusFirstValidationError);
+          }
+
+          document
+            .querySelectorAll(
+              ".multyform .formBody, .multyform form, .multyform .multyfields, .multyform .inner_multyfields, .multyform .multyfield, .multyform .field, .multyform .field input[type='text'], .multyform .submitbuttonbox, .multyform .submitButtonContainer_wrapper"
+            )
+            .forEach((element) => {
+              setImportant(element, "width", "100%");
+              setImportant(element, "max-width", "100%");
+              setImportant(element, "min-width", "0");
+            });
+
+          setImportant(
+            document.querySelector(".multyform .inner_multyfields"),
+            "display",
+            "block"
+          );
+
+          const hiddenConsent = document.querySelector(
+            ".multyform .confirmation:not(.horizontal)"
+          );
+          const consent = document.querySelector(
+            ".multyform .confirmation.horizontal"
+          );
+          if (
+            hiddenConsent &&
+            consent &&
+            consent.nextElementSibling !== hiddenConsent
+          ) {
+            hiddenConsent.parentNode.insertBefore(consent, hiddenConsent);
+          }
+
+          setImportant(consent, "position", "static");
+          setImportant(consent, "display", "grid");
+          setImportant(consent, "width", "100%");
+          setImportant(
+            consent,
+            "grid-template-columns",
+            "1.5rem minmax(0, 1fr)"
+          );
+          setImportant(consent, "gap", "0.65rem");
+          setImportant(consent, "align-items", "start");
+          setImportant(consent, "inset", "auto");
+          setImportant(consent, "transform", "none");
+
+          const consentCheckbox = consent?.querySelector(
+            "input[type='checkbox']"
+          );
+          const consentLabel = consent?.querySelector(".confirmation_text");
+          if (consentCheckbox && consentLabel) {
+            consentCheckbox.id = "rav-messer-consent";
+            consentLabel.htmlFor = consentCheckbox.id;
+          }
+
+          setImportant(hiddenConsent, "display", "none");
+          setImportant(
+            document.querySelector(
+              ".multyform .submitButtonContainer_wrapper.ravxx_hover"
+            ),
+            "display",
+            "none"
+          );
+          const submitWrapper = document.querySelector(
+            ".multyform .submitButtonContainer_wrapper:not(.ravxx_hover)"
+          );
+          const submitLink = submitWrapper?.querySelector("a");
+          const submitButton = submitWrapper?.querySelector(
+            "button[type='submit']"
+          );
+          if (submitLink) submitLink.tabIndex = -1;
+          if (submitButton && !submitButton.dataset.noamValidationFocus) {
+            submitButton.dataset.noamValidationFocus = "true";
+            submitButton.addEventListener("click", focusFirstValidationError);
+          }
+          setImportant(
+            document.querySelector(".multyform .submitbuttonbox"),
+            "height",
+            "auto"
+          );
+        };
+
+        applyResponsiveLayout();
+        new MutationObserver(applyResponsiveLayout).observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+        window.addEventListener("resize", applyResponsiveLayout);
+      })();
+    </script>
+    <noscript>כדי להירשם לעדכונים יש להפעיל JavaScript בדפדפן.</noscript>
+  </body>
+</html>
