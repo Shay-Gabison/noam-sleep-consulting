@@ -3,22 +3,22 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const javascript = await readFile(
-  new URL("../../assets/index-Dg7pR7NU.js", import.meta.url),
+  new URL("../../assets/index-DprMrgAe.js", import.meta.url),
   "utf8",
 );
 const stylesheet = await readFile(
-  new URL("../../assets/index-DTIX-nkn.css", import.meta.url),
+  new URL("../../assets/index-D1eTWmnV.css", import.meta.url),
   "utf8",
 );
 
-test("contact fields retain visible associated labels and required markers", () => {
+test("contact fields retain exact visible labels and required semantics", () => {
   for (const [id, label] of [
     ["name", "שם מלא"],
     ["phone", "טלפון"],
     ["message", "איך אפשר לעזור?"],
   ]) {
     assert.ok(
-      javascript.includes(`label",{htmlFor:"${id}",children:["${label}"`),
+      javascript.includes(`label",{htmlFor:"${id}",children:"${label}"}`),
     );
     assert.match(
       javascript,
@@ -26,17 +26,16 @@ test("contact fields retain visible associated labels and required markers", () 
     );
   }
 
-  const visibleLabelRule = stylesheet.lastIndexOf(
-    ".contact-form label{position:static;display:block",
-  );
-  assert.notEqual(visibleLabelRule, -1);
   assert.ok(
-    visibleLabelRule >
-      stylesheet.lastIndexOf(".contact-form label{position:absolute"),
+    stylesheet.includes(
+      ".contact-form label{display:flex;align-items:baseline",
+    ),
   );
-  assert.ok(
-    stylesheet.includes('.contact-form label:after{content:" (חובה)"}'),
-  );
+  assert.ok(stylesheet.includes(".contact-form label{position:static"));
+  assert.ok(!stylesheet.includes(".contact-form label{position:absolute"));
+  assert.ok(!stylesheet.includes("(חובה)"));
+  assert.ok(!javascript.includes("(חובה)"));
+  assert.ok(!javascript.includes("placeholder:"));
 });
 
 test("validation still focuses the first invalid field", () => {
@@ -49,7 +48,19 @@ test("validation still focuses the first invalid field", () => {
   assert.ok(javascript.includes("כתבו בקצרה"));
 });
 
-test("wide contact form and section expand with a resized textarea", () => {
+test("Instagram link uses the approved handle and external-link safeguards", () => {
+  assert.ok(
+    javascript.includes(
+      'href:"https://www.instagram.com/noam_gabison_/",target:"_blank",rel:"noopener noreferrer"',
+    ),
+  );
+  assert.ok(
+    javascript.includes('className:"contact__value",children:"noam_gabison_"'),
+  );
+  assert.ok(!javascript.includes("noam_gabison._"));
+});
+
+test("wide contact fields and actions retain adaptive flow", () => {
   const wideRules = stylesheet.slice(
     stylesheet.indexOf("@media(min-width:1600px)"),
   );
@@ -72,37 +83,27 @@ test("wide contact form and section expand with a resized textarea", () => {
     return declarations;
   };
 
-  const section = declarationsFor(".contact.visual-screen");
-  const grid = declarationsFor(".contact__grid");
   const form = declarationsFor(".contact-form");
   const field = declarationsFor(".contact-form>div");
   const textarea = declarationsFor(".contact-form textarea");
   const button = declarationsFor(".contact-form .button");
   const note = declarationsFor(".contact-form__note");
 
-  assert.equal(section["overflow-x"], "clip");
-  assert.equal(section["overflow-y"], "visible");
-  assert.equal(grid.height, "auto");
-  assert.equal(grid["min-height"], "944px");
-  assert.equal(grid["align-items"], "start");
-  assert.notEqual(form.position, "absolute");
-  assert.equal(form.top, "auto");
-  assert.equal(form.right, "auto");
+  assert.equal(form["align-content"], "start");
+  assert.equal(form.gap, "16px");
   assert.equal(field.position, "static");
-  assert.equal(textarea["min-height"], "110px");
+  assert.equal(field.width, "auto");
+  assert.equal(textarea["min-height"], "96px");
   assert.notEqual(button.position, "absolute");
+  assert.equal(button["min-height"], "65px");
   assert.equal(note.position, "static");
+  assert.equal(note.width, "auto");
 });
 
-test("button pseudo-element is contained and cannot intercept pointers", () => {
+test("textarea remains vertically resizable", () => {
   assert.ok(
     stylesheet.includes(
-      ".contact-form .button{position:relative;overflow:hidden}",
-    ),
-  );
-  assert.ok(
-    stylesheet.includes(
-      ".contact-form .button:before{max-width:100%;max-height:100%;pointer-events:none}",
+      ".contact-form textarea{min-height:96px;resize:vertical}",
     ),
   );
 });
