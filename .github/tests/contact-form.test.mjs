@@ -50,24 +50,49 @@ test("validation still focuses the first invalid field", () => {
   assert.ok(javascript.includes('zl.message="כתבו בקצרה'));
 });
 
-test("wide contact form uses flow layout without button overlap", () => {
+test("wide contact form and section expand with a resized textarea", () => {
   const wideRules = stylesheet.slice(
-    stylesheet.lastIndexOf("@media(min-width:1600px)"),
+    stylesheet.indexOf("@media(min-width:1600px)"),
   );
+  const declarationsFor = (selector) => {
+    const declarations = {};
+    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  assert.ok(wideRules.includes(".contact-form>div{position:static;width:auto}"));
-  assert.ok(
-    wideRules.includes(
-      ".contact-form .button{position:relative;top:auto;left:auto}",
-    ),
-  );
-  assert.ok(
-    wideRules.includes(
-      ".contact-form__note{position:static;width:auto;margin:0}",
-    ),
-  );
-  assert.ok(wideRules.includes(".contact-form textarea{min-height:110px}"));
-  assert.ok(!wideRules.includes(".contact-form>div{position:absolute"));
+    for (const match of wideRules.matchAll(
+      new RegExp(`${escapedSelector}\\{([^{}]*)\\}`, "g"),
+    )) {
+      for (const declaration of match[1].split(";")) {
+        const separator = declaration.indexOf(":");
+        if (separator === -1) continue;
+        declarations[declaration.slice(0, separator)] = declaration.slice(
+          separator + 1,
+        );
+      }
+    }
+
+    return declarations;
+  };
+
+  const section = declarationsFor(".contact.visual-screen");
+  const grid = declarationsFor(".contact__grid");
+  const form = declarationsFor(".contact-form");
+  const field = declarationsFor(".contact-form>div");
+  const textarea = declarationsFor(".contact-form textarea");
+  const button = declarationsFor(".contact-form .button");
+  const note = declarationsFor(".contact-form__note");
+
+  assert.equal(section["overflow-x"], "clip");
+  assert.equal(section["overflow-y"], "visible");
+  assert.equal(grid.height, "auto");
+  assert.equal(grid["min-height"], "944px");
+  assert.equal(grid["align-items"], "start");
+  assert.notEqual(form.position, "absolute");
+  assert.equal(form.top, "auto");
+  assert.equal(form.right, "auto");
+  assert.equal(field.position, "static");
+  assert.equal(textarea["min-height"], "110px");
+  assert.notEqual(button.position, "absolute");
+  assert.equal(note.position, "static");
 });
 
 test("button pseudo-element is contained and cannot intercept pointers", () => {
