@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const javascript = await readFile(
-  new URL("../../assets/index-hvPKpu13.js", import.meta.url),
+  new URL("../../assets/index-Dg7pR7NU.js", import.meta.url),
   "utf8",
 );
 const stylesheet = await readFile(
@@ -18,7 +18,7 @@ test("contact fields retain visible associated labels and required markers", () 
     ["message", "איך אפשר לעזור?"],
   ]) {
     assert.ok(
-      javascript.includes(`label",{htmlFor:"${id}",children:"${label}"}`),
+      javascript.includes(`label",{htmlFor:"${id}",children:["${label}"`),
     );
     assert.match(
       javascript,
@@ -40,14 +40,13 @@ test("contact fields retain visible associated labels and required markers", () 
 });
 
 test("validation still focuses the first invalid field", () => {
-  assert.ok(
-    javascript.includes(
-      'ol.querySelector(`[name="${Object.keys(zl)[0]}"]`)?.focus()',
-    ),
+  assert.match(
+    javascript,
+    /querySelector\(`\[name="\$\{Object\.keys\([A-Za-z_$][\w$]*\)\[0\]\}"\]`\)\?\.focus\(\)/,
   );
-  assert.ok(javascript.includes('zl.name="הוסיפו שם מלא'));
-  assert.ok(javascript.includes('zl.phone="הוסיפו מספר טלפון'));
-  assert.ok(javascript.includes('zl.message="כתבו בקצרה'));
+  assert.ok(javascript.includes("הוסיפו שם מלא"));
+  assert.ok(javascript.includes("הוסיפו מספר טלפון"));
+  assert.ok(javascript.includes("כתבו בקצרה"));
 });
 
 test("wide contact form and section expand with a resized textarea", () => {
