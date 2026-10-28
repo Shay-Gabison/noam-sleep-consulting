@@ -2,14 +2,85 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+const generatedHtml = await readFile(
+  new URL("../../index.html", import.meta.url),
+  "utf8",
+);
+
+const findSingleGeneratedAsset = (
+  html,
+  tagPattern,
+  attribute,
+  assetPattern,
+) => {
+  const matches = Array.from(html.matchAll(tagPattern), ([tag]) =>
+    tag.match(new RegExp(`\\b${attribute}="([^"]+)"`, "u"))?.[1],
+  ).filter((assetPath) => assetPattern.test(assetPath));
+
+  assert.equal(
+    matches.length,
+    1,
+    `Expected exactly one generated asset matching ${assetPattern}, found: ${
+      matches.join(", ") || "none"
+    }`,
+  );
+
+  return matches[0];
+};
+
+const javascriptPath = findSingleGeneratedAsset(
+  generatedHtml,
+  /<script\b[^>]*>/gu,
+  "src",
+  /^\/assets\/index-[A-Za-z0-9_-]+\.js$/u,
+);
+const stylesheetPath = findSingleGeneratedAsset(
+  generatedHtml,
+  /<link\b[^>]*>/gu,
+  "href",
+  /^\/assets\/index-[A-Za-z0-9_-]+\.css$/u,
+);
 const javascript = await readFile(
-  new URL("../../assets/index-DprMrgAe.js", import.meta.url),
+  new URL(`../..${javascriptPath}`, import.meta.url),
   "utf8",
 );
 const stylesheet = await readFile(
-  new URL("../../assets/index-D1eTWmnV.css", import.meta.url),
+  new URL(`../..${stylesheetPath}`, import.meta.url),
   "utf8",
 );
+
+test("generated asset lookup requires exactly one raw matching tag", () => {
+  const findJavascript = (html) =>
+    findSingleGeneratedAsset(
+      html,
+      /<script\b[^>]*>/gu,
+      "src",
+      /^\/assets\/index-[A-Za-z0-9_-]+\.js$/u,
+    );
+
+  assert.equal(
+    findJavascript('<script src="/assets/index-valid.js"></script>'),
+    "/assets/index-valid.js",
+  );
+  assert.throws(
+    () =>
+      findJavascript(
+        '<script src="/assets/index-duplicate.js"></script><script src="/assets/index-duplicate.js"></script>',
+      ),
+    /Expected exactly one generated asset.*found: .*duplicate.*duplicate/u,
+  );
+  assert.throws(
+    () =>
+      findJavascript(
+        '<script src="/assets/index-first.js"></script><script src="/assets/index-second.js"></script>',
+      ),
+    /Expected exactly one generated asset.*found: .*first.*second/u,
+  );
+  assert.throws(
+    () => findJavascript("<html><body></body></html>"),
+    /Expected exactly one generated asset.*found: none/u,
+  );
+});
 
 test("contact fields retain exact visible labels and required semantics", () => {
   for (const [id, label] of [
@@ -46,6 +117,22 @@ test("validation still focuses the first invalid field", () => {
   assert.ok(javascript.includes("הוסיפו שם מלא"));
   assert.ok(javascript.includes("הוסיפו מספר טלפון"));
   assert.ok(javascript.includes("כתבו בקצרה"));
+});
+
+test("contact links retain the approved visible, telephone, and WhatsApp numbers", () => {
+  assert.ok(
+    javascript.includes(
+      'href:"tel:+972532453271",dir:"ltr"',
+    ),
+  );
+  assert.ok(
+    javascript.includes(
+      'className:"contact__value",children:"053-2453271"',
+    ),
+  );
+  assert.ok(javascript.includes('"https://wa.me/972532453271?text='));
+  assert.ok(!javascript.includes("053-2354271"));
+  assert.ok(!javascript.includes("972532354271"));
 });
 
 test("Instagram link uses the approved handle and external-link safeguards", () => {
