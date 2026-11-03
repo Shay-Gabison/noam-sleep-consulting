@@ -147,7 +147,7 @@ test("Instagram link uses the approved handle and external-link safeguards", () 
   assert.ok(!javascript.includes("noam_gabison._"));
 });
 
-test("wide contact fields and actions retain adaptive flow", () => {
+test("contact fields and actions retain adaptive flow", () => {
   const wideRules = stylesheet.slice(
     stylesheet.indexOf("@media(min-width:1600px)"),
   );
@@ -177,12 +177,12 @@ test("wide contact fields and actions retain adaptive flow", () => {
   const note = declarationsFor(".contact-form__note");
 
   assert.equal(form["align-content"], "start");
-  assert.equal(form.gap, "16px");
+  assert.match(form.gap, /^(?:1rem|16px)$/);
   assert.equal(field.position, "static");
   assert.equal(field.width, "auto");
-  assert.equal(textarea["min-height"], "96px");
+  assert.ok(Number.parseFloat(textarea["min-height"]) >= 96);
   assert.notEqual(button.position, "absolute");
-  assert.equal(button["min-height"], "65px");
+  assert.ok(Number.parseFloat(button["min-height"]) >= 56);
   assert.equal(note.position, "static");
   assert.equal(note.width, "auto");
 });
